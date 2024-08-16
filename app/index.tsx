@@ -6,7 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { styles } from "@/styles/signin_signup";
 import { Link, router } from "expo-router";
 import {

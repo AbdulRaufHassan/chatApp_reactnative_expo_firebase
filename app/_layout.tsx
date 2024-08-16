@@ -1,30 +1,17 @@
-import { View, Text } from "react-native";
-import React, { createContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { router, Stack } from "expo-router";
 import { useFonts } from "expo-font";
-import { auth, onAuthStateChanged } from "@/firebase/config";
+import {
+  auth,
+  db,
+  doc,
+  onAuthStateChanged,
+  onSnapshot,
+} from "@/firebase/config";
+import myProfileContext from "@/context/myProfileContext";
 
-interface User {
-  uid: string;
-  fullName: string;
-  email: string;
-  password: string;
-}
-
-type MyProfileContext = {
-  myProfile: User;
-  setMyProfile: Function;
-};
-
-const myContext = createContext<MyProfileContext | null>(null);
-
-const RootLayout = () => {
-  const [myProfile, setMyProfile] = useState<User>({
-    uid: "",
-    fullName: "",
-    email: "",
-    password: "",
-  });
+export default function RootLayout() {
+  const [myProfile, setMyProfile] = useState<User | null>(null);
 
   const [fontsLoaded] = useFonts({
     josefinSans: require("../assets/fonts/josefinSans.ttf"),
@@ -33,6 +20,10 @@ const RootLayout = () => {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        onSnapshot(doc(db, "users", user.uid), (doc) => {
+          const data = doc.data() as User;
+          setMyProfile(data);
+        });
         router.replace("/userslist");
       } else {
         router.replace("/signin");
@@ -40,23 +31,19 @@ const RootLayout = () => {
     });
   }, []);
 
-  if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
-  }
-
   return (
-    <myContext.Provider value={{ myProfile, setMyProfile }}>
-      <Stack initialRouteName="index">
+    <myProfileContext.Provider value={myProfile}>
+      <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen
           name="signin"
           options={{ headerTitle: "", headerTransparent: true }}
         />
         <Stack.Screen name="userslist" options={{ headerShown: false }} />
-        <Stack.Screen name="chat" />
+        <Stack.Screen name="chat" options={{ headerShown: false }} />
       </Stack>
-    </myContext.Provider>
+    </myProfileContext.Provider>
   );
-};
+}
 
-export { RootLayout, myContext, User };
+export { RootLayout };

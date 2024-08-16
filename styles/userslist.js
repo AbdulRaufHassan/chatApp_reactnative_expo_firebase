@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     paddingLeft: 17,
     paddingRight: 20,
     paddingTop: 35,
-    paddingBottom: 10,
+    paddingBottom: 20,
     width: "100%",
   },
   avatar: {
@@ -39,9 +39,10 @@ export const styles = StyleSheet.create({
     width: "96%",
     paddingHorizontal: 15,
     paddingVertical: 15,
-    marginVertical: 5,
+    marginVertical: 6,
     borderRadius: 12,
     marginHorizontal: "2%",
+    elevation:5
   },
   userAvatar: {
     height: 57,
@@ -50,5 +51,6 @@ export const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
+    elevation:5
   },
 });

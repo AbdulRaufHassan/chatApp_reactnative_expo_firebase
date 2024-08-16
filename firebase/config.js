@@ -14,6 +14,10 @@ import {
   collection,
   where,
   onSnapshot,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
+  orderBy
 } from "firebase/firestore";
 
 
@@ -44,4 +48,8 @@ export {
   where,
   onSnapshot,
   signOut,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
+  orderBy
 };

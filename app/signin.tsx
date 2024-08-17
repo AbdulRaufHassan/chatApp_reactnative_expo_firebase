@@ -48,10 +48,10 @@ function SignIn() {
           router.replace("/userslist");
         })
         .catch((error) => {
-          console.log(error);
+          console.warn(error);
         });
     } catch (e) {
-      console.log(e);
+      console.warn(e);
     }
   };
 

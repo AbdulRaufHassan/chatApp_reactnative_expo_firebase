@@ -41,6 +41,7 @@ export const chatPageStyles = StyleSheet.create({
   msg_main_container: {
     width: "100%",
     marginVertical: 5,
+    paddingBottom: 30,
   },
   msgBox: {
     padding: 10,
@@ -48,7 +49,7 @@ export const chatPageStyles = StyleSheet.create({
     borderBottomRightRadius: 15,
     position: "relative",
     minWidth: "50%",
-    maxWidth: "calc(100% - 156px)",
+    maxWidth: "97%",
     elevation: 5,
     minHeight: 100,
     maxHeight: "auto",
@@ -59,6 +60,7 @@ export const chatPageStyles = StyleSheet.create({
   msgTxt: {
     fontSize: 16,
     marginHorizontal: 10,
+    flexWrap:"wrap"
   },
   msg_arrow: {
     position: "absolute",

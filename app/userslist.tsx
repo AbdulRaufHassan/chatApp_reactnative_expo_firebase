@@ -69,7 +69,7 @@ const UsersList = () => {
           borderBottomWidth: 2,
           borderColor: "rgb(215, 217, 219)",
           marginBottom: 10,
-          elevation:3
+          elevation: 3,
         }}
       >
         <View style={header}>
@@ -142,10 +142,16 @@ const UsersList = () => {
                   >
                     {item.fullName}
                   </Text>
-                  <Text style={{ color: "gray" }}>
-                    {item?.lastMessages?.[generateChatId(myProfile, item.uid)]
-                      ?.lastMessage || "Start Chat!"}
-                  </Text>
+                  {item?.lastMessages &&
+                  item?.lastMessages?.[generateChatId(myProfile, item.uid)] ? (
+                    <Text style={{ color: "gray" }}>
+                      {
+                        item?.lastMessages?.[
+                          generateChatId(myProfile, item.uid)
+                        ]?.lastMessage
+                      }
+                    </Text>
+                  ) : null}
                 </View>
               </Pressable>
             );
@@ -158,7 +164,7 @@ const UsersList = () => {
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            paddingBottom:50
+            paddingBottom: 50,
           }}
         >
           <ActivityIndicator color={"#03ad75"} size={70} />

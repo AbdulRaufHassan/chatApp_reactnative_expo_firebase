@@ -51,7 +51,7 @@ const Chat = () => {
       const q = query(
         collection(db, "messages"),
         where("chatId", "==", generateChatId(myProfile, userUid)),
-        orderBy("sendTime","desc")
+        orderBy("sendTime", "asc")
       );
 
       onSnapshot(q, (querySnapshot) => {
@@ -145,7 +145,6 @@ const Chat = () => {
         style={{
           flex: 1,
           backgroundColor: "#d5dbd6",
-          paddingBottom: 30,
         }}
       >
         {!loading ? (
@@ -184,43 +183,63 @@ const Chat = () => {
                           },
                     ]}
                   >
-                    <View
-                      style={[
-                        msgBox,
-                        isSenderMe
-                          ? {
-                              backgroundColor: "#03ad75",
-                              marginRight: 10,
-                              borderTopLeftRadius: 15,
-                            }
-                          : {
-                              backgroundColor: "white",
-                              marginLeft: 10,
-                              borderTopRightRadius: 15,
-                            },
-                      ]}
-                    >
+                    <View>
                       <View
                         style={[
-                          msg_arrow,
-                          isSenderMe ? { right: -24 } : { left: -24 },
+                          msgBox,
+                          isSenderMe
+                            ? {
+                                backgroundColor: "#03ad75",
+                                marginRight: 10,
+                                borderTopLeftRadius: 15,
+                              }
+                            : {
+                                backgroundColor: "white",
+                                marginLeft: 10,
+                                borderTopRightRadius: 15,
+                              },
                         ]}
                       >
-                        <Ionicons
-                          name={isSenderMe ? "caret-forward" : "caret-back"}
-                          size={35}
-                          color={isSenderMe ? "#03ad75" : "white"}
-                        />
+                        <View
+                          style={[
+                            msg_arrow,
+                            isSenderMe ? { right: -24 } : { left: -24 },
+                          ]}
+                        >
+                          <Ionicons
+                            name={isSenderMe ? "caret-forward" : "caret-back"}
+                            size={35}
+                            color={isSenderMe ? "#03ad75" : "white"}
+                          />
+                        </View>
+                        <Text
+                          style={[
+                            msgTxt,
+                            isSenderMe
+                              ? { color: "white" }
+                              : { color: "#03ad75" },
+                          ]}
+                        >
+                          {item.msg}
+                        </Text>
                       </View>
                       <Text
-                        style={[
-                          msgTxt,
-                          isSenderMe
-                            ? { color: "white" }
-                            : { color: "#03ad75" },
-                        ]}
+                        style={{
+                          textAlign: isSenderMe ? "left" : "right",
+                          marginHorizontal:8,
+                          marginTop:5,
+                          color:"#3b3a3a",
+                          fontSize:15
+                        }}
                       >
-                        {item.msg}
+                        {item.sendTime && new Date(item.sendTime.toDate()).toLocaleTimeString(
+                          [],
+                          {
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          }
+                        )}
                       </Text>
                     </View>
                     <View
@@ -233,10 +252,25 @@ const Chat = () => {
                     >
                       <Text
                         style={[
-                          isSenderMe ? { color: "black" } : { color: "white" },
+                          isSenderMe
+                            ? { color: "#03ad75" }
+                            : { color: "white" },
+                          {
+                            textTransform: "uppercase",
+                            fontSize: 20,
+                            letterSpacing: 1,
+                          },
                         ]}
                       >
-                        RH
+                        {isSenderMe
+                          ? myProfile &&
+                            myProfile?.fullName?.split(" ").length > 1
+                            ? `${myProfile.fullName[0][0]}${myProfile.fullName[1][0]}`
+                            : `${myProfile?.fullName[0][0]}`
+                          : userProfile &&
+                            userProfile?.fullName?.split(" ").length > 1
+                          ? `${userProfile.fullName[0][0]}${userProfile.fullName[1][0]}`
+                          : `${userProfile?.fullName[0][0]}`}
                       </Text>
                     </View>
                   </View>

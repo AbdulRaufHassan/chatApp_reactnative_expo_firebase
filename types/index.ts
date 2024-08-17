@@ -7,7 +7,7 @@ interface User {
     [key: string]: {
       chatId: string;
       lastMessage: string;
-      sendTime: string;
+      sendTime: any;
       senderUid: string;
     };
   };
@@ -18,5 +18,5 @@ interface MsgType {
   senderId: string;
   receiverId: string;
   msg: string;
-  sendTime: string;
+  sendTime: any;
 }

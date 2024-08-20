@@ -23,7 +23,6 @@ export const styles = StyleSheet.create({
   },
   searchField: {
     height: 60,
-    width: "98%",
     borderWidth: 2,
     borderColor: "rgb(215, 217, 219)",
     paddingHorizontal: 20,

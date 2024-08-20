@@ -10,6 +10,7 @@ export const chatPageStyles = StyleSheet.create({
     paddingTop: 35,
     paddingBottom: 20,
     width: "100%",
+    elevation: 5,
   },
   avatar: {
     height: 65,
@@ -33,7 +34,7 @@ export const chatPageStyles = StyleSheet.create({
     height: 70,
     paddingHorizontal: 20,
     backgroundColor: "rgb(237, 239, 242)",
-    width: "83%",
+    flex: 1,
     fontSize: 17,
     borderRadius: 15,
     elevation: 3,
@@ -45,13 +46,13 @@ export const chatPageStyles = StyleSheet.create({
   },
   msgBox: {
     padding: 10,
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
     position: "relative",
-    minWidth: "50%",
+    minWidth: "40%",
     maxWidth: "97%",
     elevation: 5,
-    minHeight: 100,
+    minHeight: 70,
     maxHeight: "auto",
     marginTop: 33,
     justifyContent: "center",
@@ -60,7 +61,9 @@ export const chatPageStyles = StyleSheet.create({
   msgTxt: {
     fontSize: 16,
     marginHorizontal: 10,
-    flexWrap:"wrap"
+    flexWrap: "wrap",
+    lineHeight: 22,
+
   },
   msg_arrow: {
     position: "absolute",
@@ -74,5 +77,10 @@ export const chatPageStyles = StyleSheet.create({
     justifyContent: "center",
     margin: 15,
     elevation: 5,
+  },
+  userFullName: {
+    color: "white",
+    fontSize: 22,
+    marginLeft: 10,
   },
 });

@@ -13,7 +13,7 @@ import myProfileContext from "@/context/myProfileContext";
 export default function RootLayout() {
   const [myProfile, setMyProfile] = useState<User | null>(null);
 
-  const [fontsLoaded] = useFonts({
+  useFonts({
     josefinSans: require("../assets/fonts/josefinSans.ttf"),
   });
 

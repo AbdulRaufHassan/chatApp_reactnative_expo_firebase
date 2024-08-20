@@ -25,8 +25,8 @@ function SignIn() {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      email: "raufh1093@gmail.com",
-      password: "123456",
+      email: "",
+      password: "",
     },
   });
   const {
@@ -112,7 +112,7 @@ function SignIn() {
             <Text style={validationText}>Password is required.</Text>
           )}
         </View>
-        <TouchableOpacity style={button} onPress={handleSubmit(signin)}>
+        <TouchableOpacity style={button} onPress={handleSubmit(signin)} activeOpacity={0.5}>
           <Text style={btn_text}>Sign In</Text>
         </TouchableOpacity>
         <View

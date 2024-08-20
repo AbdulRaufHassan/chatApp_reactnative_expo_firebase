@@ -68,13 +68,15 @@ const Chat = () => {
 
   const sendMsg = async () => {
     if (myProfile) {
+      const msg: string = newMessage.trim();
+      setNewMessage("");
       if (
         newMessage.trim() &&
         typeof userUid == "string" &&
         auth?.currentUser?.uid
       ) {
         await addDoc(collection(db, "messages"), {
-          msg: newMessage.trim(),
+          msg: msg,
           senderId: auth.currentUser.uid,
           receiverId: userUid,
           chatId: generateChatId(myProfile, userUid),
@@ -82,7 +84,7 @@ const Chat = () => {
         });
         await updateDoc(doc(db, "users", myProfile.uid), {
           [`lastMessages.${generateChatId(myProfile, userUid)}`]: {
-            lastMessage: newMessage.trim(),
+            lastMessage: msg,
             chatId: generateChatId(myProfile, userUid),
             senderUid: auth.currentUser.uid,
             sendTime: serverTimestamp(),
@@ -90,13 +92,12 @@ const Chat = () => {
         });
         await updateDoc(doc(db, "users", userUid), {
           [`lastMessages.${generateChatId(myProfile, userUid)}`]: {
-            lastMessage: newMessage.trim(),
+            lastMessage: msg,
             chatId: generateChatId(myProfile, userUid),
             senderUid: auth.currentUser.uid,
             sendTime: serverTimestamp(),
           },
         });
-        setNewMessage("");
       }
     }
   };
@@ -116,6 +117,7 @@ const Chat = () => {
     msgTxt,
     msg_arrow,
     msg_avatar,
+    userFullName,
   } = chatPageStyles;
 
   const splitUserName = userProfile?.fullName.split(" ");
@@ -140,6 +142,7 @@ const Chat = () => {
               : splitUserName && `${splitUserName[0][0]}`}
           </Text>
         </View>
+        <Text style={userFullName}>{userProfile?.fullName}</Text>
       </View>
       <View
         style={{
@@ -191,12 +194,12 @@ const Chat = () => {
                             ? {
                                 backgroundColor: "#03ad75",
                                 marginRight: 10,
-                                borderTopLeftRadius: 15,
+                                borderTopLeftRadius: 10,
                               }
                             : {
                                 backgroundColor: "white",
                                 marginLeft: 10,
-                                borderTopRightRadius: 15,
+                                borderTopRightRadius: 10,
                               },
                         ]}
                       >
@@ -226,20 +229,21 @@ const Chat = () => {
                       <Text
                         style={{
                           textAlign: isSenderMe ? "left" : "right",
-                          marginHorizontal:8,
-                          marginTop:5,
-                          color:"#3b3a3a",
-                          fontSize:15
+                          marginHorizontal: 8,
+                          marginTop: 5,
+                          color: "#3b3a3a",
+                          fontSize: 15,
                         }}
                       >
-                        {item.sendTime && new Date(item.sendTime.toDate()).toLocaleTimeString(
-                          [],
-                          {
-                            hour: "numeric",
-                            minute: "2-digit",
-                            hour12: true,
-                          }
-                        )}
+                        {item.sendTime &&
+                          new Date(item.sendTime.toDate()).toLocaleTimeString(
+                            [],
+                            {
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            }
+                          )}
                       </Text>
                     </View>
                     <View
@@ -265,12 +269,16 @@ const Chat = () => {
                         {isSenderMe
                           ? myProfile &&
                             myProfile?.fullName?.split(" ").length > 1
-                            ? `${myProfile.fullName[0][0]}${myProfile.fullName[1][0]}`
-                            : `${myProfile?.fullName[0][0]}`
+                            ? `${myProfile.fullName?.split(" ")[0][0]}${
+                                myProfile.fullName?.split(" ")[1][0]
+                              }`
+                            : `${myProfile?.fullName?.split(" ")[0][0]}`
                           : userProfile &&
                             userProfile?.fullName?.split(" ").length > 1
-                          ? `${userProfile.fullName[0][0]}${userProfile.fullName[1][0]}`
-                          : `${userProfile?.fullName[0][0]}`}
+                          ? `${userProfile.fullName?.split(" ")[0][0]}${
+                              userProfile.fullName?.split(" ")[1][0]
+                            }`
+                          : `${userProfile?.fullName?.split(" ")[0][0]}`}
                       </Text>
                     </View>
                   </View>
@@ -303,6 +311,7 @@ const Chat = () => {
         />
         <TouchableOpacity
           onPress={sendMsg}
+          activeOpacity={0.5}
           style={{
             height: 70,
             width: 70,
@@ -311,6 +320,7 @@ const Chat = () => {
             justifyContent: "center",
             alignItems: "center",
             elevation: 5,
+            marginLeft: 10,
           }}
         >
           <Ionicons

@@ -5,8 +5,9 @@ import {
   FlatList,
   Pressable,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { styles } from "@/styles/userslist";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -25,8 +26,10 @@ import { generateChatId } from "@/helpers";
 const UsersList = () => {
   const { header, avatar, searchField, user, userAvatar } = styles;
   const [users, setUsers] = useState<Array<User>>([]);
+  const [searchUsers, setSearchUsers] = useState<Array<User>>([]);
   const myProfile = useContext<User | null>(myProfileContext);
-
+  const [searchName, setSearchName] = useState<string>("");
+  const searchFieldRef = useRef<TextInput>(null);
   const signout = () => {
     signOut(auth)
       .then(() => {
@@ -39,10 +42,10 @@ const UsersList = () => {
   };
 
   const getRealTimeUsers = async () => {
-    if (auth?.currentUser?.uid) {
+    if (myProfile) {
       const q = query(
         collection(db, "users"),
-        where("uid", "!=", auth?.currentUser?.uid)
+        where("uid", "!=", myProfile.uid)
       );
       onSnapshot(q, (querySnapshot) => {
         const users: Array<User> = [];
@@ -59,7 +62,24 @@ const UsersList = () => {
     getRealTimeUsers();
   }, []);
 
+  useEffect(() => {
+    if (searchName.trim()) {
+      const filteredUsers: Array<User> = users.filter((user) =>
+        user.fullName.toLowerCase().includes(searchName.trim().toLowerCase())
+      );
+      setSearchUsers(filteredUsers);
+    }
+  }, [searchName]);
+
   const splitMyName = myProfile?.fullName.split(" ");
+
+  const userMsgDate = (sendTime: any): string => {
+    const res =
+      new Date().toDateString() === sendTime?.toDate()?.toDateString()
+        ? "Today"
+        : sendTime?.toDate().toLocaleDateString();
+    return res;
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -92,14 +112,50 @@ const UsersList = () => {
             <Ionicons name="log-out-outline" size={40} color="white" />
           </Pressable>
         </View>
-        <TextInput placeholder="Search User" style={searchField} />
+        <View
+          style={{
+            width: "100%",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TextInput
+            placeholder="Search User"
+            ref={searchFieldRef}
+            style={[
+              searchField,
+              !searchName
+                ? {
+                    width: "97%",
+                  }
+                : {
+                    marginLeft: 8,
+                    flex: 1,
+                  },
+            ]}
+            value={searchName}
+            onChangeText={(v) => setSearchName(v)}
+          />
+          {searchName && (
+            <Pressable
+              onPress={() => {
+                setSearchName("");
+                searchFieldRef.current?.blur();
+              }}
+            >
+              <Ionicons name="close" size={55} color="black" />
+            </Pressable>
+          )}
+        </View>
       </View>
       {users.length ? (
         <FlatList
-          data={users}
+          data={searchName ? searchUsers : users}
           renderItem={({ item }) => {
             return (
-              <Pressable
+              <TouchableOpacity
+                activeOpacity={0.7}
                 style={user}
                 onPress={() =>
                   router.replace({
@@ -127,33 +183,58 @@ const UsersList = () => {
                 </View>
                 <View
                   style={{
-                    flexDirection: "column",
+                    flexDirection: "row",
                     flex: 1,
                     marginLeft: 10,
                     justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
-                  <Text
+                  <View
                     style={{
-                      fontSize: 21,
-                      fontWeight: "bold",
-                      color: "#03ad75",
+                      flexDirection: "column",
+                      flex: 1,
+                      justifyContent: "center",
                     }}
                   >
-                    {item.fullName}
-                  </Text>
+                    <Text
+                      style={{
+                        fontSize: 21,
+                        fontWeight: "bold",
+                        color: "#03ad75",
+                      }}
+                    >
+                      {item.fullName}
+                    </Text>
+                    {item?.lastMessages &&
+                    item?.lastMessages?.[
+                      generateChatId(myProfile, item.uid)
+                    ] ? (
+                      <Text style={{ color: "gray" }}>
+                        {item.lastMessages?.[
+                          generateChatId(myProfile, item.uid)
+                        ].lastMessage.length > 30
+                          ? `${item.lastMessages?.[
+                              generateChatId(myProfile, item.uid)
+                            ].lastMessage.slice(0, 31)}...`
+                          : item.lastMessages?.[
+                              generateChatId(myProfile, item.uid)
+                            ].lastMessage}
+                      </Text>
+                    ) : null}
+                  </View>
                   {item?.lastMessages &&
                   item?.lastMessages?.[generateChatId(myProfile, item.uid)] ? (
-                    <Text style={{ color: "gray" }}>
-                      {
+                    <Text style={{ color: "#3b3a3a", fontSize: 13 }}>
+                      {userMsgDate(
                         item?.lastMessages?.[
                           generateChatId(myProfile, item.uid)
-                        ]?.lastMessage
-                      }
+                        ]?.sendTime
+                      )}
                     </Text>
                   ) : null}
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             );
           }}
           keyExtractor={(item) => String(item.uid)}

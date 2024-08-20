@@ -160,7 +160,7 @@ function SignUp() {
             <Text style={validationText}>{errors.password.message}</Text>
           )}
         </View>
-        <TouchableOpacity style={button} onPress={handleSubmit(signup)}>
+        <TouchableOpacity style={button} onPress={handleSubmit(signup)} activeOpacity={0.5}>
           <Text style={btn_text}>Sign Up</Text>
         </TouchableOpacity>
         <View

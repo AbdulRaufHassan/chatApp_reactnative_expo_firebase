@@ -13,10 +13,11 @@ import myProfileContext from "@/context/myProfileContext";
 export default function RootLayout() {
   const [myProfile, setMyProfile] = useState<User | null>(null);
 
-  useFonts({
-    josefinSans: require("../assets/fonts/josefinSans.ttf"),
+ const [loaded, error] = useFonts({
+    "josefinSans": require("../assets/fonts/josefinSans.ttf"),
   });
 
+  
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {

@@ -6,7 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocalSearchParams } from "expo-router";
 import { chatPageStyles } from "@/styles/chat";
 import {
@@ -46,7 +46,6 @@ const Chat = () => {
   };
 
   const getAllMsgs = () => {
-    setLoading(true);
     if (myProfile && typeof userUid == "string") {
       const q = query(
         collection(db, "messages"),
@@ -60,24 +59,20 @@ const Chat = () => {
           const data = doc.data() as MsgType;
           messages.push(data);
         });
+        setLoading(false);
         setMessages(messages);
       });
     }
-    setLoading(false);
   };
 
   const sendMsg = async () => {
-    if (myProfile) {
+    if (myProfile && newMessage.trim()) {
       const msg: string = newMessage.trim();
       setNewMessage("");
-      if (
-        newMessage.trim() &&
-        typeof userUid == "string" &&
-        auth?.currentUser?.uid
-      ) {
+      if (typeof userUid == "string") {
         await addDoc(collection(db, "messages"), {
           msg: msg,
-          senderId: auth.currentUser.uid,
+          senderId: myProfile.uid,
           receiverId: userUid,
           chatId: generateChatId(myProfile, userUid),
           sendTime: serverTimestamp(),
@@ -86,7 +81,7 @@ const Chat = () => {
           [`lastMessages.${generateChatId(myProfile, userUid)}`]: {
             lastMessage: msg,
             chatId: generateChatId(myProfile, userUid),
-            senderUid: auth.currentUser.uid,
+            senderUid: myProfile.uid,
             sendTime: serverTimestamp(),
           },
         });
@@ -94,7 +89,7 @@ const Chat = () => {
           [`lastMessages.${generateChatId(myProfile, userUid)}`]: {
             lastMessage: msg,
             chatId: generateChatId(myProfile, userUid),
-            senderUid: auth.currentUser.uid,
+            senderUid: myProfile.uid,
             sendTime: serverTimestamp(),
           },
         });
@@ -148,10 +143,11 @@ const Chat = () => {
         style={{
           flex: 1,
           backgroundColor: "#d5dbd6",
+          flexDirection: "column-reverse",
         }}
       >
         {!loading ? (
-          !messages.length ? (
+          messages.length == 0 ? (
             <View
               style={{
                 flex: 1,
@@ -170,7 +166,8 @@ const Chat = () => {
             </View>
           ) : (
             <FlatList
-              data={messages}
+              inverted
+              data={[...messages].reverse()}
               renderItem={({ item }) => {
                 const isSenderMe: boolean =
                   item.senderId === auth?.currentUser?.uid;
@@ -186,7 +183,12 @@ const Chat = () => {
                           },
                     ]}
                   >
-                    <View>
+                    <View
+                      style={{
+                        minWidth: "40%",
+                        maxWidth: "80%",
+                      }}
+                    >
                       <View
                         style={[
                           msgBox,
@@ -306,6 +308,7 @@ const Chat = () => {
       <View style={msg_footer}>
         <TextInput
           placeholder="Type your message here..."
+          value={newMessage}
           style={msgInput}
           onChangeText={(v) => setNewMessage(v)}
         />

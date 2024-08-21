@@ -16,6 +16,7 @@ import {
   collection,
   db,
   onSnapshot,
+  orderBy,
   query,
   signOut,
   where,
@@ -30,6 +31,8 @@ const UsersList = () => {
   const myProfile = useContext<User | null>(myProfileContext);
   const [searchName, setSearchName] = useState<string>("");
   const searchFieldRef = useRef<TextInput>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
   const signout = () => {
     signOut(auth)
       .then(() => {
@@ -53,6 +56,7 @@ const UsersList = () => {
           const data = doc.data() as User;
           users.push(data);
         });
+        setLoading(false);
         setUsers(users);
       });
     }
@@ -60,7 +64,7 @@ const UsersList = () => {
 
   useEffect(() => {
     getRealTimeUsers();
-  }, []);
+  }, [myProfile]);
 
   useEffect(() => {
     if (searchName.trim()) {
@@ -149,96 +153,120 @@ const UsersList = () => {
           )}
         </View>
       </View>
-      {users.length ? (
-        <FlatList
-          data={searchName ? searchUsers : users}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={user}
-                onPress={() =>
-                  router.replace({
-                    pathname: "/chat",
-                    params: { uid: String(item.uid) },
-                  })
-                }
-              >
-                <View style={userAvatar}>
-                  <Text
-                    style={{
-                      color: "#03ad75",
-                      fontSize: 20,
-                      lineHeight: 25,
-                      letterSpacing: 1,
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {item.fullName.split(" ").length > 1
-                      ? `${item.fullName.split(" ")[0][0]}${
-                          item.fullName.split(" ")[1][0]
-                        }`
-                      : `${item.fullName.split(" ")[0][0]}`}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    flex: 1,
-                    marginLeft: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
+      {!loading && users.length > 0 ? (
+        (searchName.trim() && searchUsers.length > 0) ||
+        (users.length > 0 && !searchName.trim()) ? (
+          <FlatList
+            data={searchName.trim() != "" ? searchUsers : users}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={user}
+                  onPress={() =>
+                    router.replace({
+                      pathname: "/chat",
+                      params: { uid: String(item.uid) },
+                    })
+                  }
                 >
-                  <View
-                    style={{
-                      flexDirection: "column",
-                      flex: 1,
-                      justifyContent: "center",
-                    }}
-                  >
+                  <View style={userAvatar}>
                     <Text
                       style={{
-                        fontSize: 21,
-                        fontWeight: "bold",
                         color: "#03ad75",
+                        fontSize: 20,
+                        lineHeight: 25,
+                        letterSpacing: 1,
+                        textTransform: "uppercase",
                       }}
                     >
-                      {item.fullName}
+                      {item.fullName.split(" ").length > 1
+                        ? `${item.fullName.split(" ")[0][0]}${
+                            item.fullName.split(" ")[1][0]
+                          }`
+                        : `${item.fullName.split(" ")[0][0]}`}
                     </Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flex: 1,
+                      marginLeft: 10,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "column",
+                        flex: 1,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 21,
+                          fontWeight: "bold",
+                          color: "#03ad75",
+                        }}
+                      >
+                        {item.fullName}
+                      </Text>
+                      {item?.lastMessages &&
+                      item?.lastMessages?.[
+                        generateChatId(myProfile, item.uid)
+                      ] ? (
+                        <Text style={{ color: "gray" }}>
+                          {item.lastMessages?.[
+                            generateChatId(myProfile, item.uid)
+                          ].lastMessage.length > 30
+                            ? `${item.lastMessages?.[
+                                generateChatId(myProfile, item.uid)
+                              ].lastMessage.slice(0, 31)}...`
+                            : item.lastMessages?.[
+                                generateChatId(myProfile, item.uid)
+                              ].lastMessage}
+                        </Text>
+                      ) : null}
+                    </View>
                     {item?.lastMessages &&
                     item?.lastMessages?.[
                       generateChatId(myProfile, item.uid)
                     ] ? (
-                      <Text style={{ color: "gray" }}>
-                        {item.lastMessages?.[
-                          generateChatId(myProfile, item.uid)
-                        ].lastMessage.length > 30
-                          ? `${item.lastMessages?.[
-                              generateChatId(myProfile, item.uid)
-                            ].lastMessage.slice(0, 31)}...`
-                          : item.lastMessages?.[
-                              generateChatId(myProfile, item.uid)
-                            ].lastMessage}
+                      <Text style={{ color: "#3b3a3a", fontSize: 13 }}>
+                        {userMsgDate(
+                          item?.lastMessages?.[
+                            generateChatId(myProfile, item.uid)
+                          ]?.sendTime
+                        )}
                       </Text>
                     ) : null}
                   </View>
-                  {item?.lastMessages &&
-                  item?.lastMessages?.[generateChatId(myProfile, item.uid)] ? (
-                    <Text style={{ color: "#3b3a3a", fontSize: 13 }}>
-                      {userMsgDate(
-                        item?.lastMessages?.[
-                          generateChatId(myProfile, item.uid)
-                        ]?.sendTime
-                      )}
-                    </Text>
-                  ) : null}
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-          keyExtractor={(item) => String(item.uid)}
-        />
+                </TouchableOpacity>
+              );
+            }}
+            keyExtractor={(item) => String(item.uid)}
+          />
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 26,
+                marginBottom: 60,
+                color: "#03ad75",
+                fontWeight: "600",
+              }}
+            >
+              User Not Found
+            </Text>
+          </View>
+        )
       ) : (
         <View
           style={{

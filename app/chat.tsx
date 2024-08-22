@@ -184,10 +184,17 @@ const Chat = () => {
                     ]}
                   >
                     <View
-                      style={{
-                        minWidth: "40%",
-                        maxWidth: "80%",
-                      }}
+                      style={[
+                        {
+                          flex: 1,
+                        },
+                        isSenderMe
+                          ? { alignItems: "flex-end", marginLeft: 10 }
+                          : {
+                              alignItems: "flex-start",
+                              marginRight: 10,
+                            },
+                      ]}
                     >
                       <View
                         style={[
@@ -230,11 +237,10 @@ const Chat = () => {
                       </View>
                       <Text
                         style={{
-                          textAlign: isSenderMe ? "left" : "right",
-                          marginHorizontal: 8,
+                          marginHorizontal: 15,
                           marginTop: 5,
                           color: "#3b3a3a",
-                          fontSize: 15,
+                          fontSize: 14,
                         }}
                       >
                         {item.sendTime &&
@@ -288,7 +294,6 @@ const Chat = () => {
               }}
               keyExtractor={(item, index) => String(index)}
               contentContainerStyle={{
-                flexGrow: 1,
                 justifyContent: "flex-end",
               }}
             />

@@ -17,7 +17,6 @@ export const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 80,
     fontWeight: "bold",
-    fontFamily:"josefinSans"
   },
   input_container: {
     width: "95%",

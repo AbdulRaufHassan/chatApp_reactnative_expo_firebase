@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { router, Stack } from "expo-router";
-import { useFonts } from "expo-font";
 import {
   auth,
   db,
@@ -12,11 +11,6 @@ import myProfileContext from "@/context/myProfileContext";
 
 export default function RootLayout() {
   const [myProfile, setMyProfile] = useState<User | null>(null);
-
- const [loaded, error] = useFonts({
-    "josefinSans": require("../assets/fonts/josefinSans.ttf"),
-  });
-
   
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -27,7 +21,7 @@ export default function RootLayout() {
         });
         router.replace("/userslist");
       } else {
-        router.replace("/signin");
+        router.replace("/");
       }
     });
   }, []);

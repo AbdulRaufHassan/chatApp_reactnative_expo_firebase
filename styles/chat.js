@@ -49,7 +49,8 @@ export const chatPageStyles = StyleSheet.create({
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     position: "relative",
-    flex:1,
+    minWidth: "50%",
+    maxWidth: "100%",
     elevation: 5,
     minHeight: 70,
     maxHeight: "auto",
@@ -58,7 +59,7 @@ export const chatPageStyles = StyleSheet.create({
     alignItems: "center",
   },
   msgTxt: {
-    minWidthL:"100%",
+    minWidthL: "100%",
     maxWidth: "100%",
     fontSize: 16,
     marginHorizontal: 10,
